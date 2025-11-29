@@ -167,7 +167,16 @@ endif()
 
 ctest_configure(OPTIONS "${CONFIG_OPTIONS}")
 
-ctest_build(PARALLEL_LEVEL ${nproc})
+ctest_build(
+  PARALLEL_LEVEL ${nproc}
+  NUMBER_ERRORS build_errors
+  NUMBER_WARNINGS build_warnings
+)
+message(STATUS "Build errors: ${build_errors}, warnings: ${build_warnings}")
+if((build_errors GREATER 0) OR (build_warnings GREATER 0))
+  ctest_submit()
+  message(FATAL_ERROR "Build cancelled")
+endif()
 
 if(WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
   ctest_memcheck(PARALLEL_LEVEL ${nproc})
